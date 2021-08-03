@@ -9,7 +9,7 @@ from sensor_msgs.msg import Imu
 from ds4_driver.msg import Feedback
 from ds4_driver.msg import Report
 from ds4_driver.msg import Status
-
+from . import path
 import copy
 import math
 
@@ -17,15 +17,20 @@ import math
 class ControllerRos(Controller):
     def __init__(self):
         super(ControllerRos, self).__init__()
-
+        print("Controller ros init")
+        print("At time:", rospy.Time.now())
+        self.startTime = None
+        # TODO: Add non-default/configurable path.
+        self.path = path.getPath(1, -1) # Path creation: Duration, linear speed, turn speed (=0)
         self.use_standard_msgs = rospy.get_param('~use_standard_msgs', False)
+	assert not self.use_standard_msgs
         self.deadzone = rospy.get_param('~deadzone', 0.1)
         self.frame_id = rospy.get_param('~frame_id', 'ds4')
         self.imu_frame_id = rospy.get_param('~imu_frame_id', 'ds4_imu')
         # Only publish Joy messages on change
         self._autorepeat_rate = rospy.get_param('~autorepeat_rate', 0)
         self._prev_joy = None
-
+        self.previous = None
         # Use ROS-standard messages (like sensor_msgs/Joy)
         if self.use_standard_msgs:
             self.pub_report = rospy.Publisher('raw_report', Report, queue_size=1)
@@ -40,6 +45,33 @@ class ControllerRos(Controller):
         else:
             self.pub_status = rospy.Publisher('status', Status, queue_size=1)
             self.sub_feedback = rospy.Subscriber('set_feedback', Feedback, self.cb_feedback, queue_size=1)
+        self.nextPathItemIndex = 0
+        self.timer = self.loop.create_timer(0.5, self.handlePathSteps)
+        self.timer.start()
+
+    def handlePathSteps(self, arg = None):
+        # Publish updated speed values
+        self.cb_report(None)
+        # Handle timer reset if needed, timer will call this method again upon expiration
+        if self.path.isDone(self.getTime()):
+            # Not needed, path is finished.
+            # Stop timer and don't request next callback
+            self.timer.stop()
+            self.timer = None
+            return False
+        # Need reset: change interval to time until next update,
+        # then re-start timer and ask for callback when finished
+        self.timer.stop()
+        self.timer.interval = 0.005 
+        self.timer.start()
+        return True
+
+    def getTime(self):
+        if self.startTime is None:
+            self.startTime = rospy.Time.now()
+            return rospy.Time(0)
+        dur = rospy.Time.now() - self.startTime
+        return rospy.Time(dur.secs, dur.nsecs)
 
     def cb_report(self, report):
         """
@@ -47,43 +79,20 @@ class ControllerRos(Controller):
         :param report:
         :return:
         """
-        report_msg = Report()
-        report_msg.header.frame_id = self.frame_id
-        report_msg.header.stamp = rospy.Time.now()
-        for attr in dir(report):
-            if attr.startswith('_'):
-                continue
-            if hasattr(report_msg, attr):
-                val = getattr(report, attr)
-                setattr(report_msg, attr, val)
-        # Fix (potentially) incorrect data reported from device
-        imu_data = Controller.get_imu_data(report)
-        report_msg.lin_acc_x = imu_data['lin_acc']['x']
-        report_msg.lin_acc_y = imu_data['lin_acc']['y']
-        report_msg.lin_acc_z = imu_data['lin_acc']['z']
-        report_msg.ang_vel_x = imu_data['ang_vel']['x']
-        report_msg.ang_vel_y = imu_data['ang_vel']['y']
-        report_msg.ang_vel_z = imu_data['ang_vel']['z']
-
-        status_msg = self._report_to_status_(report_msg, self.deadzone)
-        status_msg.imu.header.frame_id = self.imu_frame_id
-
-        if self.use_standard_msgs:
-            battery_msg = self._status_to_battery_(status_msg)
-            joy_msg = self._status_to_joy_(status_msg)
-            imu_msg = self._status_to_imu_(status_msg)
-            self.pub_report.publish(report_msg)
-            self.pub_battery.publish(battery_msg)
-            if self._prev_joy is None \
-                    or joy_msg.axes != self._prev_joy.axes \
-                    or joy_msg.buttons != self._prev_joy.buttons:
-                self.pub_joy.publish(joy_msg)
-            self.pub_imu.publish(imu_msg)
-
-            self._prev_joy = joy_msg
-        else:
-            self.pub_status.publish(status_msg)
-
+	print("CB_REPORT START")
+        assert not self.use_standard_msgs # Unsupported at this time; see original code if it needs to be implemented.
+        status = Status()
+        # Copy header values that original code set
+        status.header.frame_id = self.frame_id
+        status.header.stamp = rospy.Time(0) 
+        status.imu.header.frame_id = self.imu_frame_id
+        # Per config/twist_2dof.yaml, these two values control the speed and rotation
+	status.axis_left_y = self.path.getCurrentValue(self.getTime(), path.Path.SPEED)
+        status.axis_right_x = self.path.getCurrentValue(self.getTime(), path.Path.ROTATION)
+        # Set battery to max in case that would cause any issues
+        # Think there's some low battery indication we'll avoid this way
+        status.battery_percentage = 1.0
+        self.pub_status.publish(status)
     def cb_feedback(self, msg):
         """
         Callback method for ds4_driver/Feedback
@@ -91,6 +100,7 @@ class ControllerRos(Controller):
         :type msg: Feedback
         :return:
         """
+	print("CB_FEEDBACK START")
         if self.device is None:
             return
 
@@ -134,6 +144,7 @@ class ControllerRos(Controller):
         :type msg: JoyFeedbackArray
         :return:
         """
+	print("CB_JOY_FEEDBACK START")
         feedback = Feedback()
         for jf in msg.array:
             if jf.type == JoyFeedback.TYPE_LED:
@@ -154,6 +165,7 @@ class ControllerRos(Controller):
         self.cb_feedback(feedback)
 
     def cb_joy_pub_timer(self, _):
+	print("CB_JOY_PUB_TIMER START")
         if self._prev_joy is not None:
             self.pub_joy.publish(self._prev_joy)
 

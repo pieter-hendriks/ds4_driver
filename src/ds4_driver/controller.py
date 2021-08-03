@@ -42,15 +42,16 @@ class Controller(Thread):
 
     def read_report(self):
         report = self.device.read_report()
-
+        print("Reading report...")
         if not report:
             if report is False:
-                return
+                return False
 
             self.cleanup_device()
-            return
+            return False
 
         self.fire_event('device-report', report)
+        return True
 
     def run(self):
         self.loop.run()
