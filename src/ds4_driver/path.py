@@ -9,8 +9,8 @@ class SpeedSpecifier:
 		self.turn = turn
 
 	def equals(self, value, value2 = None):
-	if value2 is None:
-		return (self.velocity, self.turn) == value
+		if value2 is None:
+			return (self.velocity, self.turn) == value
 	return (self.velocity, self.turn) == (value, value2)
 
 	def __getitem__(self, i):
