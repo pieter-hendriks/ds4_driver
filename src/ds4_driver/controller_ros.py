@@ -8,7 +8,6 @@ from ds4_driver.msg import Status
 class ControllerRos(Controller):
     def __init__(self):
         super(ControllerRos, self).__init__()
-        assert not self.use_standard_msgs
         self.startTime = None
         # TODO: Add non-default/configurable path.
         self.path = path.getPath(3, 0.3)
@@ -16,7 +15,8 @@ class ControllerRos(Controller):
         self.deadzone = rospy.get_param('~deadzone', 0.1)
         self.frame_id = rospy.get_param('~frame_id', 'ds4')
         self.imu_frame_id = rospy.get_param('~imu_frame_id', 'ds4_imu')
-        
+        assert not self.use_standard_msgs
+
         # Only publish Joy messages on change
         self._autorepeat_rate = rospy.get_param('~autorepeat_rate', 0)
         self._prev_joy = None
@@ -41,15 +41,15 @@ class ControllerRos(Controller):
         status.header.stamp = rospy.Time.now()
         status.imu.header.frame_id = self.imu_frame_id
         # Per config/twist_2dof.yaml, these two values control the speed and rotation
-        status.axis_left_y = self.path.getCurrentValue(self.getTime(), path.Path.SPEED)
-        status.axis_right_x = self.path.getCurrentValue(self.getTime(), path.Path.ROTATION)
+        status.axis_left_y = self.path.getCurrentValue(self.getTime()).velocity
+        status.axis_right_x = self.path.getCurrentValue(self.getTime()).turn
         # Set battery to max in case that would cause any issues
         # Think there's some low battery indication we'll avoid this way
         status.battery_percentage = 1.0
-        
+
         self.pub_status.publish(status)
         return
-        
+
     def cb_feedback(self, msg):
         """
         Callback method for ds4_driver/Feedback
@@ -82,7 +82,7 @@ class ControllerRos(Controller):
         # We don't implement this method
         # There's no actual controller, so we can't use controller feedback
         return
-    
+
     def cb_joy_pub_timer(self, _):
         # We don't implement this method
         return

@@ -6,7 +6,7 @@ class SpeedSpecifier:
         assert -1 < turn < 1
         self.velocity = velocity
         self.turn = turn
-        
+
 
 def getPath(pathDuration, linearSpeed, turnRate = 0):
     if pathDuration == 0 or pathDuration is None:
@@ -16,14 +16,14 @@ def getPath(pathDuration, linearSpeed, turnRate = 0):
 class Path:
     SPEED = 0
     ROTATION = 1
-    
+
     def __init__(self, timeValueDict):
+        self.path = sorted(timeValueDict.items())
         # First key must be zero, else we have invalid time periods
         assert sorted(self.path.items())[0][0]  == 0
         # Last speed value must be zero, else we never stop
         assert sorted(self.path.items())[-1][1] == (0, 0)
-        self.path = sorted(timeValueDict.items())
-        
+
     def getCurrentValue(self, currentTime):
         assert currentTime >= 0
         prevVal = None
@@ -34,9 +34,9 @@ class Path:
                 return prevVal
             prevVal = val
         raise RuntimeError("This should be unreachable.")
-    
+
     def isDone(self, currentTime):
         return currentTime > self.getEndTime()
-    
+
     def getEndTime(self):
         return self.path[-1][0]
