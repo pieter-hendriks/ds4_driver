@@ -11,7 +11,7 @@ class SpeedSpecifier:
 	def equals(self, value, value2 = None):
 		if value2 is None:
 			return (self.velocity, self.turn) == value
-	return (self.velocity, self.turn) == (value, value2)
+		return (self.velocity, self.turn) == (value, value2)
 
 	def __getitem__(self, i):
 		if i == 0:
@@ -41,11 +41,11 @@ class Path:
 	# First key must be zero, else we have invalid time periods
 		assert self.path[0][0]  == rospy.Time(0)
 		# Last speed value must be zero, else we never stop
-	assert self.path[-1][1].equals((0, 0))
+		assert self.path[-1][1].equals((0, 0))
 	def getCurrentValue(self, currentTime, type):
 		print(isinstance(currentTime, rospy.Time))
 		assert currentTime >= rospy.Time(0)
-		prevVal = None
+		prevVal: SpeedSpecifier = None
 		for key,val in self.path:
 			print(key)
 			print(currentTime)
@@ -53,11 +53,11 @@ class Path:
 				# This can't be true for first item, so the only instance where we would return None is eliminated.
 				assert prevVal is not None # But for safety, we'll assert this anyway
 				if type is Path.SPEED:
-			return prevVal[0]
-		elif type is Path.ROTATION:
-			return prevVal[1]
-		else:
-			raise RuntimeError("This should be unreachable(non-speed, non-rotation control type)")
+					return prevVal[0]
+				elif type is Path.ROTATION:
+					return prevVal[1]
+				else:
+					raise RuntimeError("This should be unreachable(non-speed, non-rotation control type)")
 			prevVal = val
 		print(currentTime)
 		print(self.path)
