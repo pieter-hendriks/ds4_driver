@@ -79,7 +79,6 @@ class ControllerRos(Controller):
 		:param report:
 		:return:
 		"""
-		print("CB_REPORT START")
 		assert not self.use_standard_msgs # Unsupported at this time; see original code if it needs to be implemented.
 		status = Status()
 		# Copy header values that original code set

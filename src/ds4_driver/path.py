@@ -27,7 +27,7 @@ def getPath(pathDuration, linearSpeed, turnRate = 0):
 	if pathDuration == 0 or pathDuration is None:
 		return Path({0: SpeedSpecifier(0, 0)})
 	p = Path({0: SpeedSpecifier(linearSpeed, turnRate), pathDuration: SpeedSpecifier(0, 0)})
-	print(p.path)
+	# print(p.path)
 	return p
 
 class Path:
@@ -43,12 +43,12 @@ class Path:
 		# Last speed value must be zero, else we never stop
 		assert self.path[-1][1].equals((0, 0))
 	def getCurrentValue(self, currentTime, type):
-		print(isinstance(currentTime, rospy.Time))
+		#print(isinstance(currentTime, rospy.Time))
 		assert currentTime >= rospy.Time(0)
 		prevVal = None
 		for key,val in self.path:
-			print(key)
-			print(currentTime)
+			#print(key)
+			#print(currentTime)
 			if key > currentTime:
 				# This can't be true for first item, so the only instance where we would return None is eliminated.
 				assert prevVal is not None # But for safety, we'll assert this anyway
@@ -59,9 +59,9 @@ class Path:
 				else:
 					raise RuntimeError("This should be unreachable(non-speed, non-rotation control type)")
 			prevVal = val
-		print(currentTime)
-		print(self.path)
-		print(self.isDone(currentTime))
+		#print(currentTime)
+		#print(self.path)
+		#print(self.isDone(currentTime))
 		return 0
 		raise RuntimeError("This should be unreachable.")
 
