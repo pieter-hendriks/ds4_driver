@@ -21,7 +21,16 @@ class ControllerRos(Controller):
 		print("At time:", rospy.Time.now())
 		self.startTime = None
 		# TODO: Add non-default/configurable path.
-		self.path = path.getPath(5, -0.25) # Path creation: Duration, linear speed, turn speed (=0)
+		checkpoints = []
+		time = 2
+		speed = -0.4
+		turn = 0
+		for i in range(15):
+			checkpoints.append((time, speed, turn))
+			speed = speed * -1
+		checkpoints = [(0, -0.2, 0), (2, 0.2, 0), (2, -0.2, 0), (2, 0, 0)]		
+		self.path = path.getMultiCheckpointPath(checkpoints) # Path creation: Duration, linear speed, turn speed (=0)
+		print(path)
 		self.use_standard_msgs = rospy.get_param('~use_standard_msgs', False)
 		assert not self.use_standard_msgs
 		self.deadzone = rospy.get_param('~deadzone', 0.1)

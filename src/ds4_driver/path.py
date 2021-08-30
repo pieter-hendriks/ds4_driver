@@ -23,6 +23,15 @@ class SpeedSpecifier:
 	def __repr__(self):
 		return "speed: {:.3f}, turn: {:.3f}".format(self.velocity, self.turn)
 
+
+def getMultiCheckpointPath(checkpoints):
+	if (checkpoints[0][0] not in [0, None]):
+		checkpoints.insert(0, (0,0,0))
+ 	assert checkpoints[-1][1] == checkpoints[-1][2] == 0
+	# Hard to do this any other way
+	checkpoints = {x[0]: SpeedSpecifier(x[1], x[2]) for x in checkpoints}
+	return Path(checkpoints)
+
 def getPath(pathDuration, linearSpeed, turnRate = 0):
 	if pathDuration == 0 or pathDuration is None:
 		return Path({0: SpeedSpecifier(0, 0)})
