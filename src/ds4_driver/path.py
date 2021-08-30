@@ -71,9 +71,10 @@ class Path:
 				else:
 					raise RuntimeError("This should be unreachable(non-speed, non-rotation control type)")
 			prevVal = val
-		#print(currentTime)
-		#print(self.path)
-		#print(self.isDone(currentTime))
+		print(currentTime)
+		print(self.path)
+		print(self.isDone(currentTime))
+
 		return 0
 		raise RuntimeError("This should be unreachable.")
 
