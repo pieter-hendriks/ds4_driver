@@ -26,7 +26,7 @@ class ControllerRos(Controller):
 		base = 0
 		for i in range(4):
 			checkpoints.append((base+time, speed, turn))
-			checkpoints.append((base+time+time, -1*speed, turn))
+			checkpoints.append((base+time+time, -1*speed, -1*turn))
 			base += 2*time
 		checkpoints.append((base+time, 0, 0))
 		self.path = path.getMultiCheckpointPath(checkpoints) # Path creation: Duration, linear speed, turn speed (=0)
