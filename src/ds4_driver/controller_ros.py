@@ -20,9 +20,9 @@ class ControllerRos(Controller):
 		self.startTime = None
 		# TODO: Add non-default/configurable path.
 		checkpoints = []
-		time = 3.2#5
+		time = 5
 		speed = -0.3
-		turn = 0#-0.34
+		turn = -0.34
 		base = 0
 		for i in range(4):
 			checkpoints.append((base+time, speed, turn))
