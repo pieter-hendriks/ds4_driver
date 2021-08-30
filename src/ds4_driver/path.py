@@ -30,8 +30,6 @@ def getMultiCheckpointPath(checkpoints):
  	assert checkpoints[-1][1] == checkpoints[-1][2] == 0
 	# Hard to do this any other way
 	checkpoints = {x[0]: SpeedSpecifier(x[1], x[2]) for x in checkpoints}
-	print("Created path")
-	print(checkpoints)
 
 	return Path(checkpoints)
 
@@ -57,8 +55,6 @@ class Path:
 	def getCurrentValue(self, currentTime, type):
 		#print(isinstance(currentTime, rospy.Time))
 		assert currentTime >= rospy.Time(0)
-		print (currentTime)
-		print("###")
 		prevVal = None
 		for key,val in self.path:
 			#print(key)
@@ -72,11 +68,7 @@ class Path:
 					return prevVal[1]
 				else:
 					raise RuntimeError("This should be unreachable(non-speed, non-rotation control type)")
-			print("LOOPING")
 			prevVal = val
-		print(currentTime)
-		print(self.path)
-		print(self.isDone(currentTime))
 
 		return 0
 		raise RuntimeError("This should be unreachable.")

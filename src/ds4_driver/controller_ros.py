@@ -17,8 +17,6 @@ import math
 class ControllerRos(Controller):
 	def __init__(self):
 		super(ControllerRos, self).__init__()
-		print("Controller ros init")
-		print("At time:", rospy.Time.now())
 		self.startTime = None
 		# TODO: Add non-default/configurable path.
 		checkpoints = []
@@ -55,7 +53,7 @@ class ControllerRos(Controller):
 			self.pub_status = rospy.Publisher('status', Status, queue_size=1)
 			self.sub_feedback = rospy.Subscriber('set_feedback', Feedback, self.cb_feedback, queue_size=1)
 		self.nextPathItemIndex = 0
-		self.timer = self.loop.create_timer(0.5, self.handlePathSteps)
+		self.timer = self.loop.create_timer(0.005, self.handlePathSteps)
 		self.timer.start()
 
 	def handlePathSteps(self, arg = None):
@@ -96,7 +94,6 @@ class ControllerRos(Controller):
 		status.imu.header.frame_id = self.imu_frame_id
 		# Per config/twist_2dof.yaml, these two values control the speed and rotation
 		currentTime = self.getTime()
-		print("Got the time = ", currentTime)
 		status.axis_left_y = self.path.getCurrentValue(self.getTime(), path.Path.SPEED)
 		status.axis_right_x = self.path.getCurrentValue(self.getTime(), path.Path.ROTATION)
 		# Set battery to max in case that would cause any issues
