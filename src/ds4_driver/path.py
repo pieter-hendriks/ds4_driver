@@ -57,6 +57,8 @@ class Path:
 	def getCurrentValue(self, currentTime, type):
 		#print(isinstance(currentTime, rospy.Time))
 		assert currentTime >= rospy.Time(0)
+		print (currentTime)
+		print("###")
 		prevVal = None
 		for key,val in self.path:
 			#print(key)
@@ -70,6 +72,7 @@ class Path:
 					return prevVal[1]
 				else:
 					raise RuntimeError("This should be unreachable(non-speed, non-rotation control type)")
+			print("LOOPING")
 			prevVal = val
 		print(currentTime)
 		print(self.path)
