@@ -28,6 +28,7 @@ class ControllerRos(Controller):
 			checkpoints.append((base+time, speed, turn))
 			checkpoints.append((base+time+time, -1*speed, turn))
 			base += 2*time
+		checkpoints.append((base+time, 0, 0))
 		self.path = path.getMultiCheckpointPath(checkpoints) # Path creation: Duration, linear speed, turn speed (=0)
 		#self.path = path.getPath(2, -0.2, 0)
 		self.use_standard_msgs = rospy.get_param('~use_standard_msgs', False)
