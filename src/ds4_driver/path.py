@@ -30,7 +30,9 @@ def getMultiCheckpointPath(checkpoints):
  	assert checkpoints[-1][1] == checkpoints[-1][2] == 0
 	# Hard to do this any other way
 	checkpoints = {x[0]: SpeedSpecifier(x[1], x[2]) for x in checkpoints}
-	print(f"Created path: {checkpoints}")
+	print("Created path")
+	print(checkpoints)
+
 	return Path(checkpoints)
 
 def getPath(pathDuration, linearSpeed, turnRate = 0):
