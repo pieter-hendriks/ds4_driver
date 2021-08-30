@@ -28,7 +28,7 @@ class ControllerRos(Controller):
 			speed = speed * -1
 		checkpoints = [(0, -0.2, 0), (2, 0.2, 0), (4, -0.2, 0), (6, 0, 0)]
 		self.path = path.getMultiCheckpointPath(checkpoints) # Path creation: Duration, linear speed, turn speed (=0)
-		self.path = path.getPath(2, -0.2, 0)
+		#self.path = path.getPath(2, -0.2, 0)
 		self.use_standard_msgs = rospy.get_param('~use_standard_msgs', False)
 		assert not self.use_standard_msgs
 		self.deadzone = rospy.get_param('~deadzone', 0.1)
