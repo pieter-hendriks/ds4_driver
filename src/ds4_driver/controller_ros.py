@@ -94,6 +94,8 @@ class ControllerRos(Controller):
 		status.header.stamp = rospy.Time(0)
 		status.imu.header.frame_id = self.imu_frame_id
 		# Per config/twist_2dof.yaml, these two values control the speed and rotation
+		currentTime = self.getTime()
+		print("Got the time = ", currentTime)
 		status.axis_left_y = self.path.getCurrentValue(self.getTime(), path.Path.SPEED)
 		status.axis_right_x = self.path.getCurrentValue(self.getTime(), path.Path.ROTATION)
 		# Set battery to max in case that would cause any issues
