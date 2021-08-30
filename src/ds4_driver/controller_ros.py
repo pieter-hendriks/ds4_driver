@@ -24,7 +24,7 @@ class ControllerRos(Controller):
 		speed = -0.3
 		turn = -0.34
 		base =0
-		for i in range(2):
+		for i in range(1):
 			checkpoints.append((base+time, speed, turn))
 			checkpoints.append((base+time+time, -1*speed, -1*turn))
 			base += 2*time
