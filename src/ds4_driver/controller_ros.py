@@ -84,7 +84,7 @@ class ControllerRos(Controller):
 			# Stop timer and don't request next callback
 			self.timer.stop()
 			self.timer = None
-			return False
+			exit(0)
 		# Need reset: change interval to time until next update,
 		# then re-start timer and ask for callback when finished
 		self.timer.stop()
@@ -115,7 +115,7 @@ class ControllerRos(Controller):
 		currentTime = self.getTime()
 		status.axis_left_y = self.path.getCurrentValue(self.getTime(), path.Path.SPEED)
 		status.axis_right_x = self.path.getCurrentValue(self.getTime(), path.Path.ROTATION)
-		if (self.path.isDone()):
+		if (self.path.isDone(self.getTime())):
 			exit(0)
 		# Set battery to max in case that would cause any issues
 		# Think there's some low battery indication we'll avoid this way
