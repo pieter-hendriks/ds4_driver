@@ -20,25 +20,30 @@ class ControllerRos(Controller):
 		self.startTime = None
 		# TODO: Add non-default/configurable path.
 		checkpoints = []
-		time = 2
-		speed = -0.1
-		turn = -0.1
-		base =0
+		interval = 2
+		speed = -0.2
+		turn = -0.3
+		relativeTime =0
 		for i in range(1):
-			checkpoints.append((base+time, speed, turn))
+			checkpoints.append((relativeTime, speed, turn))
+			relativeTime += interval
 			# At the turn, there's inconsistency when turn/speed is high enough
 			# This mitigates that somewhat
 			if turn != 0:
-				base += 0.1
-				checkpoints.append((base+time, 0, turn))
-			checkpoints.append((base+time+time, -1*speed, -1*turn))
+				checkpoints.append((relativeTime, 0, turn))
+				relativeTime += 0.1
+			checkpoints.append((relativeTime, -1*speed, -1*turn))
+			relativeTime += interval
 			if turn != 0:
-				base += 0.1
-				checkpoints.append((base + time + time, 0, -1*turn))
-
-			base += 2*time
-		checkpoints.append((base+time+time+0.2, 0.1, 0))
-		checkpoints.append((base+time+time+0.3, 0, 0))
+				checkpoints.append((relativeTime, 0, -1*turn))
+				relativeTime += 0.1
+		if (checkpoints[-1][1] >= 0.5):
+			checkpoints.append((relativeTime, 0.3, 0))
+			relativeTime += 0.05
+		if (checkpoints[-1][1] >= 0.3):
+			checkpoints.append((relativeTime, 0.1, 0))
+			relativeTime += 0.05
+		checkpoints.append((relativeTime, 0, 0))
 		self.path = path.getMultiCheckpointPath(checkpoints) # Path creation: Duration, linear speed, turn speed (=0)
 		#self.path = path.getPath(2, -0.2, 0)
 		self.use_standard_msgs = rospy.get_param('~use_standard_msgs', False)
