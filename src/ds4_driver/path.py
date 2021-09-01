@@ -30,7 +30,7 @@ def getMultiCheckpointPath(checkpoints):
  	assert checkpoints[-1][1] == checkpoints[-1][2] == 0
 	# Hard to do this any other way
 	checkpoints = {x[0]: SpeedSpecifier(x[1], x[2]) for x in checkpoints}
-	print(f"Path checkpoints dict = {checkpoints}")
+	print(checkpoints)
 
 	return Path(checkpoints)
 
@@ -53,7 +53,8 @@ class Path:
 		assert self.path[0][0]  == rospy.Time(0)
 		# Last speed value must be zero, else we never stop
 		assert self.path[-1][1].equals((0, 0))
-		print(f"Path::Path() -> Self.path = {self.path}")
+		print("Path::Path() -->")
+		print(self.path)
 	def getCurrentValue(self, currentTime, type):
 		#print(isinstance(currentTime, rospy.Time))
 		assert currentTime >= rospy.Time(0)
