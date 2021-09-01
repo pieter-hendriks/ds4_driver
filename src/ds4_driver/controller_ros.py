@@ -13,6 +13,8 @@ from . import path
 import copy
 import math
 
+def sign(x):
+	return 1 if x > 0 else -1
 
 class ControllerRos(Controller):
 	def __init__(self):
@@ -30,12 +32,12 @@ class ControllerRos(Controller):
 			# At the turn, there's inconsistency when turn/speed is high enough
 			# This mitigates that somewhat
 			if turn != 0:
-				checkpoints.append((relativeTime, 0.1, turn))
+				checkpoints.append((relativeTime, sign(speed) * 0.1, turn))
 				relativeTime += 0.1
 			checkpoints.append((relativeTime, -1*speed, -1*turn))
 			relativeTime += interval
 			if turn != 0:
-				checkpoints.append((relativeTime, 0.1, -1*turn))
+				checkpoints.append((relativeTime, sign(speed) * -0.1, -1*turn))
 				relativeTime += 0.1
 		if (checkpoints[-1][1] >= 0.5):
 			checkpoints.append((relativeTime, 0.3, 0))
