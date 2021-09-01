@@ -49,6 +49,8 @@ class Path:
 		self.path = sorted(timeValueDict.items())
 		for i in range(len(self.path)):
 			self.path[i] = rospy.Time(secs=int(self.path[i][0]), nsecs=(self.path[i][0]%1)*10e9), self.path[i][1]
+			print("Created time instance: ")
+			print(self.path[i][0].secs, self.path[i][1].secs)
 	# First key must be zero, else we have invalid time periods
 		assert self.path[0][0]  == rospy.Time(0)
 		# Last speed value must be zero, else we never stop
