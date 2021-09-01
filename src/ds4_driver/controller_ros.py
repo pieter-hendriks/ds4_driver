@@ -41,10 +41,10 @@ class ControllerRos(Controller):
 				relativeTime += 0.1
 		if (checkpoints[-1][1] >= 0.5):
 			checkpoints.append((relativeTime, 0.3, 0))
-			relativeTime += 0.05
+			relativeTime += 0.15
 		if (checkpoints[-1][1] >= 0.3):
 			checkpoints.append((relativeTime, 0.1, 0))
-			relativeTime += 0.05
+			relativeTime += 0.15
 		checkpoints.append((relativeTime, 0, 0))
 		self.path = path.getMultiCheckpointPath(checkpoints) # Path creation: Duration, linear speed, turn speed (=0)
 		#self.path = path.getPath(2, -0.2, 0)
@@ -115,6 +115,8 @@ class ControllerRos(Controller):
 		currentTime = self.getTime()
 		status.axis_left_y = self.path.getCurrentValue(self.getTime(), path.Path.SPEED)
 		status.axis_right_x = self.path.getCurrentValue(self.getTime(), path.Path.ROTATION)
+		if (self.path.isDone()):
+			exit(0)
 		# Set battery to max in case that would cause any issues
 		# Think there's some low battery indication we'll avoid this way
 		status.battery_percentage = 1.0
